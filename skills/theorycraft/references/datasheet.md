@@ -13,8 +13,13 @@ theorycraft/<jogo>/<versão>/
   dados/           tabelas extraídas, CSV ou JSON, com o nome original
   jogo.sqlite      banco montado por scripts/montar_banco.py
   esquema.md       o que é cada tabela e coluna, e como se ligam
+  catalogo/        o que cada item, magia, habilidade, inimigo e NPC faz e onde conseguir
+  missoes/         passo a passo de cada missão
+  mapas/           pontos por região (CSV) e mapas interativos (HTML)
+  inimigos/        moveset, dano e tempos de cada inimigo e chefe
+  criacao/         receitas (CSV) e rotas calculadas
   mecanicas/       uma ficha por sistema
-  builds/          uma ficha por build analisada
+  builds/          builds e combos, com números e premissas
   planilha.xlsx    opcional (scripts/exportar_planilha.py)
 theorycraft/<jogo>/calc.py      calculadora (copiada de scripts/calc_modelo.py)
 theorycraft/<jogo>/DIARIO.md    fatos confirmados com fonte e status
