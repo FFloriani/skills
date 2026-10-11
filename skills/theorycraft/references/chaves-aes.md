@@ -1,7 +1,8 @@
 # Chave AES de jogos Unreal: como conseguir e usar (cópia local, só leitura)
 
 Serve para `.pak` e `.utoc`/`.ucas` cifrados de Unreal Engine 4 e 5. Verificado em 2026-10-11.
-O aviso legal (uma vez) e o porquê dos limites estão em `references/limites-legais.md`, seção 6.
+O aviso legal (uma vez) e o porquê dos limites estão na seção "Limites" do SKILL.md. O detalhe
+jurídico por país (EUA, Brasil, UE) está no `references/limites-legais.md` da skill `datamine`.
 
 ## Sumário
 1. Saber o que está cifrado
