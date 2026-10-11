@@ -1,36 +1,36 @@
 # skills
 
-Skills que eu criei para o Claude (Claude Code e claude.ai). Cada skill fica na sua própria pasta dentro de `skills/`.
+Skills I built for Claude (Claude Code and claude.ai). Each skill lives in its own folder under `skills/`.
 
-| Skill | O que faz | Como chamar |
+| Skill | What it does | How to call it |
 |---|---|---|
-| [datamine](skills/datamine/) | Estuda jogos instalados no PC para aprender como foram feitos: identifica a engine, extrai assets e tabelas, decompila, desofusca e decifra uma cópia só para leitura, e documenta mecânicas e fórmulas para você criar o seu jogo. Conteúdo em português. | `/datamine` |
-| [skillsmp-search](skills/skillsmp-search/) | Busca skills prontas no marketplace [SkillsMP](https://skillsmp.com) por palavra-chave, categoria, profissão ou idioma. | `/skillsmp-search` |
+| [datamine](skills/datamine/) | Studies games installed on your PC to learn how they were made: identifies the engine, extracts assets and data tables, decompiles, deobfuscates and decrypts a copy for reading only, and documents mechanics and formulas so you can build your own game. Content is in Portuguese. | `/datamine` |
+| [skillsmp-search](skills/skillsmp-search/) | Searches the [SkillsMP](https://skillsmp.com) marketplace for ready-made skills by keyword, category, occupation or language. | `/skillsmp-search` |
 
-## Como instalar
+## Installation
 
-**Claude Code**: copie a pasta da skill para `~/.claude/skills/`.
+**Claude Code**: copy the skill folder into `~/.claude/skills/`.
 
 ```bash
 git clone https://github.com/FFloriani/skills.git
 cp -r skills/skills/datamine ~/.claude/skills/
 ```
 
-Depois é só digitar `/datamine` (ou pedir normalmente, que o Claude aciona sozinho).
+Then type `/datamine` (or just ask normally and Claude will pick it up).
 
-**claude.ai**: compacte a pasta da skill em `.zip` e envie na área de Skills das configurações.
+**claude.ai**: zip the skill folder and upload it in the Skills section of your settings.
 
-## Configuração extra
+## Extra setup
 
-- **skillsmp-search** precisa de uma chave da API do SkillsMP (crie em skillsmp.com). Coloque em uma variável de ambiente `SKILLSMP_API_KEY` ou num arquivo `~/.config/skillsmp/key` com a chave numa linha só.
-- **datamine** usa Python 3 só para os scripts opcionais em `scripts/`.
+- **skillsmp-search** needs a SkillsMP API key (create one at skillsmp.com). Put it in a `SKILLSMP_API_KEY` environment variable or in a file at `~/.config/skillsmp/key`, with the key on a single line.
+- **datamine** needs Python 3 only for the optional scripts in `scripts/`.
 
-## Estrutura
+## Structure
 
 ```
 skills/
-  <nome-da-skill>/
-    SKILL.md        instruções que o Claude lê
-    references/     material de apoio, lido só quando precisa
-    scripts/        programas que o Claude pode rodar
+  <skill-name>/
+    SKILL.md        instructions Claude reads
+    references/     supporting material, loaded only when needed
+    scripts/        programs Claude can run
 ```
