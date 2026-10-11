@@ -35,6 +35,9 @@ lugar) roda numa cópia. Ferramenta que se injeta no jogo só em single-player o
 | RPG Maker MV/MZ | `data/*.json` já em texto | `js/` em texto puro |
 | Electron/HTML5 | `npx @electron/asar extract app.asar <pasta>` | JavaScript em texto |
 
+Unreal com `.pak`/`.utoc` cifrado (a maioria dos MMOs): rode `scripts/verificar_cifra.py` e siga
+`references/chaves-aes.md` para conseguir e validar a chave.
+
 Ferramentas paradas, evite como padrão: Il2CppDumper (última versão 2024, só até Unity 2022.2),
 Il2CppInspector original (suspenso em 2022), UModel (só até UE4, 2021), AssetStudio original.
 

@@ -125,6 +125,9 @@ Alguns jogos cifram os paks com uma chave AES: uma sequência de 64 caracteres h
 normalmente escrita com `0x` na frente. Decifrar uma cópia para leitura está no escopo; avise o
 usuário uma vez do risco legal, como pede a seção "Escopo e limites" do SKILL.md.
 
+O passo a passo completo (diagnóstico, ordem para conseguir a chave, validação, mapeamentos e o que
+fazer quando nada funciona) está em `references/chaves-aes.md`. Resumo:
+
 - A chave costuma ser publicada pela comunidade de modding daquele jogo. Se não for, ela está no
   executável do cliente, e há scanners locais que leem uma cópia do `-Shipping.exe` e listam chaves
   candidatas.

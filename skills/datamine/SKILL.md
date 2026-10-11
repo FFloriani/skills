@@ -21,6 +21,8 @@ mecânicas de jogo não são protegidas por direito autoral (Lei 9.610/98, art. 
   próprio cliente. O resultado fica na pasta de estudo: não recifre, não grave de volta no jogo e
   não publique a chave, o arquivo aberto nem a ferramenta. Em alguns países decifrar já conta como
   contornar proteção, mesmo sem publicar (veja `references/limites-legais.md`); avise o usuário uma vez.
+  Para ver o que está cifrado e como conseguir a chave: `python scripts/verificar_cifra.py "<pasta>"` e
+  `references/chaves-aes.md`.
 - Só jogos single-player ou offline. Em jogo online, ferramenta aberta junto do jogo pode dar
   banimento, e mexer em economia, ranking ou tráfego de rede afeta outros jogadores: fica de fora.
 - Nada extraído é publicado nem enviado a serviço online, inclusive sites que pedem o executável.

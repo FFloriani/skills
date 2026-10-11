@@ -21,7 +21,8 @@ volta para o jogo.
   (como o UE4SS) só valem em jogo single-player offline.
 - Arquivo cifrado: pode decifrar uma cópia para leitura, achando a rotina e a chave no próprio
   cliente. Jogos online costumam proibir isso nos termos de uso; avise o usuário uma vez. Não
-  publique a chave, os arquivos abertos nem a ferramenta.
+  publique a chave, os arquivos abertos nem a ferramenta. Diagnóstico do que está cifrado:
+  `python scripts/verificar_cifra.py "<pasta>"`; como conseguir a chave: `references/chaves-aes.md`.
 - Jogo online: parte das regras roda no servidor e não está nos arquivos (drop, alguns cálculos,
   eventos). O que faltar vira `medido-jogando` ou dado da comunidade com fonte, nunca chute.
 - Publicar fórmulas, números e guias é o que as wikis fazem. Arquivos extraídos (tabelas brutas,
