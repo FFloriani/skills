@@ -1,0 +1,8 @@
+# pacotes gerados e anotações locais
+dist/
+pesquisa/
+*.skill
+
+# Python
+__pycache__/
+*.pyc
