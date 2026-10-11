@@ -5,6 +5,7 @@ Skills I built for Claude (Claude Code and claude.ai). Each skill lives in its o
 | Skill | What it does | How to call it |
 |---|---|---|
 | [datamine](skills/datamine/) | Studies games installed on your PC to learn how they were made: identifies the engine, extracts assets and data tables, decompiles, deobfuscates and decrypts a copy for reading only, and documents mechanics and formulas so you can build your own game. Content is in Portuguese. | `/datamine` |
+| [theorycraft](skills/theorycraft/) | For players: scans 100% of a game's installed files, extracts every table and formula, builds a complete datasheet (SQLite database, CSVs and one sheet per mechanic) and calculates builds, DPS, effective HP, breakpoints and stat weights. Also diffs patches. Content is in Portuguese. | `/theorycraft` |
 | [skillsmp-search](skills/skillsmp-search/) | Searches the [SkillsMP](https://skillsmp.com) marketplace for ready-made skills by keyword, category, occupation or language. | `/skillsmp-search` |
 
 ## Installation
