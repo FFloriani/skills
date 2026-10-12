@@ -15,7 +15,9 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -23,6 +25,36 @@ from pathlib import Path
 
 API_URL = "https://skillsmp.com/api/v1/skills/search"
 KEY_FILE = Path.home() / ".config" / "skillsmp" / "key"
+
+_ANSI = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]|\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b.?")
+_stripped = 0
+
+
+def clean(value) -> str:
+    """Strip terminal escapes and control/invisible characters from API text.
+
+    Marketplace fields are written by third parties: an escape sequence can
+    rewrite what the terminal shows, and invisible Unicode (tag characters,
+    zero-width, bidi) can smuggle instructions to a model reading the output.
+    """
+    global _stripped
+    raw = str(value)
+    kept = "".join(
+        ch for ch in _ANSI.sub("", raw)
+        if ch in "\n\t" or unicodedata.category(ch) not in ("Cc", "Cf", "Co", "Cn")
+    )
+    _stripped += len(raw) - len(kept)
+    return kept
+
+
+def clean_obj(obj):
+    if isinstance(obj, str):
+        return clean(obj)
+    if isinstance(obj, list):
+        return [clean_obj(v) for v in obj]
+    if isinstance(obj, dict):
+        return {clean(k): clean_obj(v) for k, v in obj.items()}
+    return obj
 
 
 def load_api_key() -> str | None:
@@ -98,12 +130,13 @@ def print_human(body: dict, headers: dict) -> None:
         print("No skills found. Try broader keywords or fewer filters.")
     else:
         for i, item in enumerate(results, 1):
-            name = pick(item, "name", "title", "slug") or "(unnamed)"
-            author = pick(item, "author", "creator", "owner")
-            desc = pick(item, "description", "summary", "tagline") or ""
-            lang = pick(item, "contentLanguage", "language")
+            name = clean(pick(item, "name", "title", "slug") or "(unnamed)")
+            author = clean(pick(item, "author", "creator", "owner") or "")
+            desc = clean(pick(item, "description", "summary", "tagline") or "")
+            lang = clean(pick(item, "contentLanguage", "language") or "")
             stars = pick(item, "stars", "starCount", "stargazers")
-            url = pick(item, "skillUrl", "url", "link", "githubUrl", "html_url")
+            stars = clean(stars) if stars is not None else None
+            url = clean(pick(item, "skillUrl", "url", "link", "githubUrl", "html_url") or "")
             header = f"{i}. {name}"
             if author:
                 header += f" — {author}"
@@ -167,9 +200,15 @@ def main(argv: list[str]) -> int:
 
     body, headers = search(args, api_key)
     if args.json:
-        print(json.dumps(body, indent=2, ensure_ascii=False))
+        print(json.dumps(clean_obj(body), indent=2, ensure_ascii=False))
     else:
         print_human(body, headers)
+    if _stripped:
+        print(
+            f"[warning] removed {_stripped} control/hidden characters from marketplace text; "
+            "a listing carrying hidden characters is suspicious.",
+            file=sys.stderr,
+        )
     return 0 if body.get("success", True) and "error" not in body else 1
 
 
