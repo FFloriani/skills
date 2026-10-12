@@ -36,12 +36,15 @@ python scripts/auditar_readme.py README.md --tipo cli --json
 | P1 | `varios-h1`, `sem-h1`, `nivel-pulado` | Hierarquia de títulos |
 | P1 | `inicio-rapido-longo` | Primeiro bloco do início rápido com até 20 linhas |
 | P1 | `sem-contribuicao-nem-suporte`, `licenca-nao-citada` | Como contribuir/pedir ajuda; licença citada |
-| P1 | `seletor-de-idiomas` | Seletor idêntico entre `README.*.md` |
+| P1 | `seletor-de-idiomas`, `paridade-traducao` | Seletor idêntico e mesma estrutura de títulos entre `README.md` e `README.<tag>.md` |
 | P1 | `caminho-local`, `email`, `definicao-longa`, `muito-curto`, `mermaid-*` | Dados pessoais; definição ≤160; tamanho; Mermaid válido |
 | P2 | `muitos-badges`, `emoji-*`, `shortcode-emoji` | Até 5 badges; sem emoji decorativo |
 | P2 | `adjetivo-vazio`, `cara-de-ia`, `travessao` | Texto sem marketing nem tique de IA |
 | P2 | `contagem-fixa`, `versao-fixa`, `fragmento-gh-depreciado` | Nada que envelhece; `<picture>` no lugar de `#gh-*` |
 | P2 | `muito-longo`, `sem-toc`, `sem-demo`, `sem-status` | Tamanho, sumário, demo de CLI, status |
+| P2 | `conteudo-de-mantenedor` | Runbook de release, secrets do CI, estrutura do repositório fora do README do usuário |
+| P2 | `fato-repetido`, `bloco-repetido` | Um lar por fato: nada dito ou colado duas vezes |
+| P2 | `licenca-restritiva-no-fim`, `paridade-traducao-conteudo` | Licença copyleft/restritiva avisada no topo; blocos/tabelas/imagens iguais entre traduções |
 
 ## O que o script NÃO vê (revisão humana, sua)
 
@@ -54,7 +57,13 @@ Faça esta leitura **depois** do script e **antes** de entregar:
 5. **O About, a `description` do manifesto e a definição** dizem a mesma coisa?
 6. **O tom é de gente**: frases diretas, termos da interface exatos, sem adjetivo de marketing?
 7. **Nada exposto** sem o usuário querer: e-mail, caminho, chave Pix, nome real.
-8. **Se há tradução**, ela está em sincronia com o original?
+8. **Se há tradução**, ela está em sincronia com o original e soa natural (não traduzês)?
+9. **Públicos misturados**: há conteúdo de mantenedor entre o de usuário? **Enquadramento de uma ferramenta só** depois que o projeto passou a suportar várias? (confira contra o código: o texto antigo pode estar errado.)
+10. **Defasagem**: versões, nomes de arquivo e links batem com `git log` e com os arquivos de hoje?
+11. **O README é citado em testes ou CI?** (`readme_citado_em_testes_ou_ci` do descobridor.) Se sim, a mudança precisa ajustar o teste, com justificativa.
+12. **Preferência do autor**: o que é enfeite do autor e não problema? Pergunte antes de cortar (P0 não é preferência).
+
+Pré-voo completo para README existente: `references/melhorar-readme-existente.md`.
 
 ## Relatório de auditoria (modo "só auditar")
 
@@ -65,7 +74,7 @@ Entregue, nesta ordem:
 3. **O que você leu e não conseguiu checar** (ex.: não rodei o comando; não vi o release).
 4. **Próximo passo**: uma ação (corrigir os P0; ou regenerar com `better-readme criar`).
 
-Não reescreva o README no modo auditar sem pedido.
+Não reescreva o README no modo auditar sem pedido. Quando o usuário pedir para aplicar as correções (modo melhorar), entregue o resultado como **lista de decisões** (moveu, removeu e por quê, reescreveu, manteve por preferência sua, testes alterados, pendências): modelo em `references/melhorar-readme-existente.md`.
 
 ## O que é boa prática (não regra): como apresentar
 

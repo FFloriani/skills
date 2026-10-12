@@ -109,6 +109,10 @@ O NomeDoApp é gratuito e mantido no meu tempo livre. Se ele te poupa trabalho, 
 ```
 
 - Traduza texto, títulos de seção e alt de imagem. **Não** traduza comandos, código, nomes de arquivo, nomes de flags nem URLs.
+- **Traduza o sentido, não palavra por palavra.** Reescreva no ritmo de texto técnico do idioma de destino e reestruture frases à vontade; mapear frase a frase produz "traduzês". Mantenha em inglês os termos que a comunidade realmente usa em inglês (commit, pull request, token, build, endpoint, prompt) e traduza o que tem termo nativo.
+- **Espelhe a estrutura**: mesmas seções, mesmas tabelas, mesmos links e **o mesmo número de títulos**, na mesma ordem. A paridade é verificável: `auditar_readme.py` compara níveis de título, blocos de código, tabelas e imagens entre `README.md` e `README.<tag>.md` (`paridade-traducao`).
+- **Combine o tom** do produto: se os exemplos do produto são coloquiais, o README pode ser.
+- **Âncoras mudam quando o título muda**: atualize os links `](#...)` do arquivo traduzido para os títulos traduzidos.
 - Marca de sincronização em cada tradução: `<!-- Traduzido de README.md @ <commit curto> em <data> -->`. Tradução desatualizada deve avisar: "Esta versão pode estar atrás do README em inglês."
 - Só ofereça tradução se houver público real **e** quem mantenha. 32 de 36 READMEs de projetos grandes não têm tradução; o mais comum é localizar a interface do app (Crowdin/Weblate), que é outra coisa.
 - Pastas por idioma (`docs/pt-BR/`) valem para documentação extensa; o README só aponta.

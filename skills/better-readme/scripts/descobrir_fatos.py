@@ -116,6 +116,12 @@ def info_git(raiz: Path) -> dict:
     ramo = git(raiz, "symbolic-ref", "--short", "refs/remotes/origin/HEAD")
     ramo = ramo.split("/", 1)[1] if ramo and "/" in ramo else git(raiz, "branch", "--show-current")
     tags = (git(raiz, "tag", "--sort=-v:refname") or "").splitlines()[:5]
+    alteracoes = (git(raiz, "status", "--porcelain") or "").splitlines()
+    a_frente = atras = None
+    if ramo and git(raiz, "rev-parse", "--verify", "--quiet", f"origin/{ramo}"):
+        cont = git(raiz, "rev-list", "--left-right", "--count", f"HEAD...origin/{ramo}")
+        if cont and len(cont.split()) == 2:
+            a_frente, atras = (int(x) for x in cont.split())
     return {
         "repositorio_git": True,
         "remoto": remoto,
@@ -125,7 +131,10 @@ def info_git(raiz: Path) -> dict:
         "ramo_padrao": ramo,
         "ultimo_commit": git(raiz, "log", "-1", "--format=%cI"),
         "tags_recentes": tags,
-        "sujo": bool(git(raiz, "status", "--porcelain")),
+        "sujo": bool(alteracoes),
+        "arquivos_alterados": [l.strip() for l in alteracoes[:12]],
+        "commits_a_frente_do_remoto": a_frente,
+        "commits_atras_do_remoto": atras,
     }
 
 
@@ -349,10 +358,19 @@ def info_readme(raiz: Path, arquivos: list[Path]) -> dict:
     linhas = texto.splitlines()
     h1 = next((l.lstrip("# ").strip() for l in linhas if re.match(r"^#\s+\S", l)), None)
     gerador = re.search(r"(?i)readme-ai|generated (by|with)|auto-?generated|gerado (por|com|automaticamente)", texto)
+    conhecidos = {rel(raiz, p) for p in candidatos}
+    derivados = [
+        rel(raiz, p) for p in arquivos
+        if re.match(r"(?i)^readme(\.[\w-]+)?\.(md|markdown|rst|txt)$", p.name) and rel(raiz, p) not in conhecidos
+    ][:15]
+    for extra in ("docs/index.md", "docs/index.rst"):
+        if (raiz / extra).exists():
+            derivados.append(extra)
     return {
         "existe": True,
         "principal": rel(raiz, principal),
         "outros": [rel(raiz, p) for p in candidatos if p != principal],
+        "possiveis_documentos_derivados": derivados,
         "linhas": len(linhas),
         "bytes": len(texto.encode("utf-8")),
         "h1": h1,
@@ -360,6 +378,34 @@ def info_readme(raiz: Path, arquivos: list[Path]) -> dict:
         "indicio_de_gerador": gerador.group(0) if gerador else None,
         "pendencias_marcadas": len(re.findall(r"(?i)TODO|PENDENTE|em breve|coming soon", texto)),
     }
+
+
+def readme_fixado_por_testes(raiz: Path, arquivos: list[Path]) -> list[str]:
+    """Linhas de testes, CI e automações que citam README/CONTRIBUTING.
+
+    Projetos às vezes fixam em teste o texto do README (títulos exatos, lista de
+    arquivos, frases obrigatórias). Reestruturar sem saber disso quebra o CI.
+    """
+    achados: list[str] = []
+    for p in arquivos:
+        r = rel(raiz, p)
+        em_pasta_de_teste = re.search(r"(^|/)(tests?|__tests__|specs?|e2e|\.github/workflows)/", r)
+        nome_de_teste = re.search(r"(^test_.*\.py$|_test\.(go|py)$|\.(test|spec)\.(js|ts|tsx|jsx)$|Tests?\.cs$)", p.name)
+        automacao = p.name in ("Makefile", ".pre-commit-config.yaml", "package.json", "tox.ini", "noxfile.py")
+        if not (em_pasta_de_teste or nome_de_teste or automacao):
+            continue
+        try:
+            if p.stat().st_size > 300_000:
+                continue
+        except OSError:
+            continue
+        for i, linha in enumerate(ler(p).splitlines(), 1):
+            if re.search(r"README|CONTRIBUTING", linha):
+                achados.append(f"{r}:{i}")
+                break
+        if len(achados) >= 12:
+            break
+    return achados
 
 
 def info_traducoes(raiz: Path, arquivos: list[Path]) -> list[str]:
@@ -526,7 +572,15 @@ def main() -> int:
     licenca = detectar_licenca(raiz)
     readme = info_readme(raiz, arquivos)
     comunidade = info_comunidade(raiz)
+    dados_git = info_git(raiz)
+    fixado = readme_fixado_por_testes(raiz, arquivos)
     avisos = []
+    if dados_git.get("sujo") and readme.get("existe"):
+        avisos.append("Árvore com alterações não commitadas: o README pode carregar trabalho do autor. Não sobrescreva; confirme antes.")
+    if dados_git.get("commits_atras_do_remoto"):
+        avisos.append(f"A branch está {dados_git['commits_atras_do_remoto']} commit(s) atrás de origin: o README remoto pode ser diferente.")
+    if fixado:
+        avisos.append("Testes, CI ou automações citam README/CONTRIBUTING: confira o que está fixado antes de reestruturar.")
     if not licenca["arquivo"]:
         avisos.append("Sem arquivo LICENSE na raiz (P0 na auditoria).")
     if comunidade["funding"]["arquivo"] and not comunidade["funding"]["no_lugar_certo"]:
@@ -538,7 +592,7 @@ def main() -> int:
 
     saida = {
         "pasta": str(raiz),
-        "git": info_git(raiz),
+        "git": dados_git,
         "tipo_provavel": topo,
         "confianca_do_tipo": confianca,
         "candidatos_de_tipo": [{"tipo": t, "pontos": n, "evidencias": evid[t]} for t, n in ranking],
@@ -547,6 +601,7 @@ def main() -> int:
         "comandos_encontrados": comandos,
         "licenca": licenca,
         "readme_atual": readme,
+        "readme_citado_em_testes_ou_ci": fixado,
         "readmes_traduzidos": info_traducoes(raiz, arquivos),
         "midia": info_midia(raiz, arquivos),
         "workflows": info_workflows(raiz),

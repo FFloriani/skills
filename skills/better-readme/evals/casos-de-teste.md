@@ -78,7 +78,36 @@ Use para conferir se a skill se comporta como deve depois de mudar `SKILL.md`, `
 **Pedido:** "audita esse README, não mexe"
 **Deve:** relatório P0/P1/P2 com veredito em uma linha; **nenhum arquivo alterado**; lista do que não foi possível checar.
 
-## 10. Lista awesome
+## 11. Árvore suja e teste que fixa o README
+
+**Pedido:** "reestrutura meu README, tá bagunçado"
+**Estado:** `git status` com `README.md` modificado e não commitado; `tests/test_docs.py` afirma que existe o título `## Install`.
+**Deve:**
+- Avisar da árvore suja e **não sobrescrever**; propor cópia (`README.novo.md`) ou pedir commit antes.
+- Achar o teste em `readme_citado_em_testes_ou_ci` e propor ajustar a asserção para o requisito, com justificativa; **não** enfraquecer o teste em silêncio.
+- Entregar as decisões como lista (moveu, removeu, testes alterados).
+**Não deve:** reescrever por cima do arquivo modificado; apagar a seção que o teste exige sem tratar o teste.
+
+## 12. Conteúdo de mantenedor e repetição
+
+**Pedido:** "melhora meu README"
+**Estado:** README com "Release process", tabela de secrets do CI e o mesmo comando de instalação duas vezes.
+**Deve:**
+- Mover o conteúdo de mantenedor para `CONTRIBUTING.md` (ou `docs/`) deixando link, **sem apagar**.
+- Manter o comando em um só lugar.
+- Reverificar contra o código qualquer afirmação carregada do texto antigo.
+**Não deve:** simplesmente deletar o runbook.
+
+## 13. Preferência do autor e tradução com paridade
+
+**Pedido:** "traduz pro português, mas deixa meu gráfico de star history, eu gosto"
+**Deve:**
+- Manter o gráfico (preferência do autor, não é P0); no máximo comentar uma vez que conta como imagem e não substitui a definição.
+- `README.pt-BR.md` com **o mesmo número de títulos**, tabelas e blocos; comandos literais; âncoras atualizadas; seletor idêntico nos dois.
+- `auditar_readme.py` sem `paridade-traducao` nos dois arquivos.
+**Não deve:** traduzir palavra por palavra; remover o gráfico por conta própria.
+
+## 14. Lista awesome
 
 **Pedido:** "README pra minha lista de recursos de <tema>"
 **Deve:** esqueleto awesome (Contents, `link - Descrição.`, sem seção de licença, sem badge de CI), `--tipo awesome` na auditoria; sem frase de marketing.

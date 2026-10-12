@@ -87,7 +87,7 @@ PLACEHOLDERS = [
 RE_OWNER_REPO = re.compile(r"\bOWNER/REPO\b|<owner>/<repo>|\bseu-usuario/seu-repo\b", re.I)
 HYPE = re.compile(
     r"(?i)\b(poderos[oa]s?|incr[ií]vel|incr[ií]veis|revolucion[aá]ri[oa]s?|inovador[a]?|"
-    r"blazing(ly)?[ -]fast|powerful|amazing|awesome|ultimate|cutting[- ]edge|state[- ]of[- ]the[- ]art|"
+    r"blazing(ly)?[ -]fast|powerful|amazing|ultimate|cutting[- ]edge|state[- ]of[- ]the[- ]art|"
     r"seamless(ly)?|game[- ]changer|world[- ]class|next[- ]gen(eration)?|robust[oa]?|perfeit[oa]s?)\b"
 )
 CARA_DE_IA = re.compile(
@@ -144,6 +144,44 @@ def existe_com_caixa(base: Path, alvo: str) -> tuple[bool, bool]:
 def e_badge(src: str) -> bool:
     s = src.lower()
     return any(h in s for h in HOSTS_BADGE) or re.search(r"/badge\.svg|/badge(\?|/)", s) is not None
+
+
+RE_TRADUCAO = re.compile(r"(?i)^readme[._-]([a-z]{2,3})([_-][A-Za-z0-9]{2,4})?\.md$")
+RE_MANTENEDOR = re.compile(
+    r"(?i)\b(release process|processo de release|como (fazer|publicar) (uma )?(release|vers[aã]o)|"
+    r"publicando uma vers[aã]o|runbook|ci secrets|segredos do ci|guia do mantenedor|"
+    r"maintainers?'? guide|maintainer notes|debugging|depura[çc][ãa]o interna|"
+    r"arquitetura interna|repository structure|estrutura do reposit[óo]rio)\b"
+)
+RE_LICENCA_RESTRITIVA = re.compile(
+    r"GNU AFFERO GENERAL PUBLIC|GNU GENERAL PUBLIC LICENSE|Server Side Public License|"
+    r"Business Source License|\bBUSL\b|NonCommercial|Non-Commercial|Commons Clause", re.I
+)
+RE_LINHA_TABELA = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$")
+
+
+def estrutura_markdown(texto: str) -> dict:
+    """Esqueleto comparável de um Markdown: níveis de título, blocos, tabelas, imagens."""
+    niveis: list[int] = []
+    codigo = tabelas = imagens = 0
+    cerca = None
+    for l in texto.splitlines():
+        m = re.match(r"^\s*(`{3,}|~{3,})", l)
+        if cerca is None and m:
+            cerca = (m.group(1)[0], len(m.group(1)))
+            codigo += 1
+            continue
+        if cerca is not None:
+            if re.match(rf"^\s*{re.escape(cerca[0])}{{{cerca[1]},}}\s*$", l):
+                cerca = None
+            continue
+        m = re.match(r"^(#{1,6})\s+\S", l)
+        if m:
+            niveis.append(len(m.group(1)))
+        if RE_LINHA_TABELA.match(l):
+            tabelas += 1
+        imagens += len(re.findall(r"!\[[^\]]*\]\(|<img\b", l))
+    return {"niveis": niveis, "codigo": codigo, "tabelas": tabelas, "imagens": imagens}
 
 
 def auditar(readme: Path, raiz: Path, tipo: str | None) -> tuple[list[Achado], dict, list]:
@@ -445,6 +483,59 @@ def auditar(readme: Path, raiz: Path, tipo: str | None) -> tuple[list[Achado], d
         faltam = [p.name for p in irmaos if p.name.lower() not in cabeca.lower()]
         if faltam:
             add("P1", "seletor-de-idiomas", 1, f"Sem link no topo para: {', '.join(faltam)}.", "Coloque o mesmo seletor de idiomas no topo de todos os arquivos.")
+
+    # --- paridade com as traduções (mesma estrutura, verificável) ---
+    if irmaos and (RE_TRADUCAO.match(readme.name) or readme.name.lower() == "readme.md"):
+        meu = estrutura_markdown(texto)
+        for p in irmaos:
+            if not RE_TRADUCAO.match(p.name):
+                continue
+            outro = estrutura_markdown(p.read_text(encoding="utf-8", errors="replace"))
+            if outro["niveis"] != meu["niveis"]:
+                add("P1", "paridade-traducao", 1,
+                    f"Estrutura de títulos difere de {p.name}: {len(meu['niveis'])} aqui, {len(outro['niveis'])} lá.",
+                    "Espelhe seções, tabelas e links nas duas versões, na mesma ordem e com o mesmo número de títulos.")
+            dif = [f"{rot} {meu[ch]} × {outro[ch]}" for ch, rot in
+                   (("codigo", "blocos de código"), ("tabelas", "tabelas"), ("imagens", "imagens")) if meu[ch] != outro[ch]]
+            if dif:
+                add("P2", "paridade-traducao-conteudo", 1, f"Diferenças com {p.name}: {', '.join(dif)}.",
+                    "Confira se algo foi omitido ou acrescentado só em uma das versões.")
+
+    # --- conteúdo de mantenedor, repetição, licença restritiva ---
+    for i, nv, t in titulos:
+        if RE_MANTENEDOR.search(t):
+            add("P2", "conteudo-de-mantenedor", i + 1, f"Seção de mantenedor no README do usuário: '{t[:50]}'.",
+                "Mova para CONTRIBUTING.md ou docs/ e deixe um link (mover, não apagar).")
+    vistas: dict[str, int] = {}
+    for i, l in enumerate(linhas):
+        if not prosa(i) or re.match(r"^\s*(\||#)", l):
+            continue
+        t = re.sub(r"\s+", " ", re.sub(r"[^\w\s]", "", l.lower())).strip()
+        if len(t) < 50:
+            continue
+        if t in vistas:
+            add("P2", "fato-repetido", i + 1, f"Frase repetida (também na linha {vistas[t]}): '{l.strip()[:50]}'.",
+                "Um lar por fato: mantenha no ponto mais raso em que o leitor precisa e linke no resto.")
+        else:
+            vistas[t] = i + 1
+    blocos_vistos: dict[str, int] = {}
+    for a, b, _ in blocos:
+        conteudo = "\n".join(x.strip() for x in linhas[a + 1:b] if x.strip())
+        if conteudo.count("\n") < 1:
+            continue
+        if conteudo in blocos_vistos:
+            add("P2", "bloco-repetido", a + 1, f"Bloco de código igual ao da linha {blocos_vistos[conteudo]}.",
+                "Mantenha em um lugar e linke (o duplicado envelhece em separado).")
+        else:
+            blocos_vistos[conteudo] = a + 1
+    if licenca is not None and tipo != "awesome":
+        try:
+            texto_lic = licenca.read_text(encoding="utf-8", errors="replace")[:8000]
+        except OSError:
+            texto_lic = ""
+        if RE_LICENCA_RESTRITIVA.search(texto_lic) and not re.search(r"(?i)licen[cs]e|licen[çc]a|agpl|gpl|sspl|busl", "\n".join(linhas[:40])):
+            add("P2", "licenca-restritiva-no-fim", 1, "Licença copyleft/restritiva sem aviso no topo.",
+                "Ponha badge ou uma linha de licença nas primeiras 40 linhas: é o que mais desqualifica rápido; o texto completo fica no fim.")
 
     # --- P2: polimento ---
     if n < 12:
