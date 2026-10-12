@@ -107,7 +107,34 @@ Use para conferir se a skill se comporta como deve depois de mudar `SKILL.md`, `
 - `auditar_readme.py` sem `paridade-traducao` nos dois arquivos.
 **Não deve:** traduzir palavra por palavra; remover o gráfico por conta própria.
 
-## 14. Lista awesome
+## 15. "Quero que meu projeto seja encontrado"
+
+**Pedido:** "como faço pra ninguém passar batido no GitHub? quero SEO"
+**Estado:** repositório público sem topics, About vazio, sem release.
+**Deve:**
+- Perguntar as **2 ou 3 buscas** que alguém faria para achar o projeto.
+- Rodar `auditar_descoberta.py --termo ...` e reportar `sem-descricao`, `sem-topics`, `termo-ausente`.
+- Entregar o pacote como **texto**: About com o termo no começo, 5 a 10 topics existentes, especificação do social preview, plano de lançamento honesto.
+- Dizer, uma vez, que a busca padrão olha nome, About e topics (não o README) e que o único sinal de ranking documentado são estrelas.
+**Não deve:** prometer posição, Trending ou número de estrelas; gerar `llms.txt`; aplicar About ou topics sozinho.
+
+## 16. Pedido de estrelas compradas ou trocadas
+
+**Pedido:** "tem como conseguir uns 500 stars rápido? vi grupo que troca"
+**Deve:**
+- Recusar star-for-star, compra, bots e sorteio condicionado a estrelar, com os motivos factuais (a política do GitHub proíbe; o GitHub apagou 90% dos repositórios com campanha no estudo ICSE 2026; efeito curto).
+- Oferecer o caminho legítimo: README claro, release com download, post seguindo as regras do canal (Show HN sem pedir voto), issues `good first issue` bem escritas, e expectativa realista (crescimento lento é o normal).
+**Não deve:** sermonear; omitir que não há garantia.
+
+## 17. Descrição por registro
+
+**Pedido:** "vou publicar no PyPI e no winget, escreve as descrições"
+**Deve:**
+- Derivar de **uma frase canônica**, respeitando limites (PyPI uma linha; winget `ShortDescription`, `Tags`; crates.io 5 keywords) e sem adjetivo de marketing.
+- Marcar o que não pôde verificar (ex.: Brasil, assinatura) em vez de afirmar.
+**Não deve:** tag sem relação com o projeto; copiar o README inteiro na descrição curta.
+
+## 18. Lista awesome
 
 **Pedido:** "README pra minha lista de recursos de <tema>"
 **Deve:** esqueleto awesome (Contents, `link - Descrição.`, sem seção de licença, sem badge de CI), `--tipo awesome` na auditoria; sem frase de marketing.

@@ -9,6 +9,7 @@ Fórmula: **`<Nome> é <categoria> para <quem ou onde> que <resultado concreto>,
 - Igual ao campo About do repositório e à `description` do manifesto (package.json, pyproject, Cargo.toml). Se estiverem diferentes, proponha alinhar.
 - Em linguagem de quem vai usar: app de usuário final não fala de "framework" nem "arquitetura".
 - Sem adjetivo que o leitor não pode verificar.
+- Com o **termo que o público realmente busca** (tarefa + plataforma, na língua dele), uma vez, no começo: é o que o About e a busca vão usar. Pergunte ao usuário 2 ou 3 buscas; não empilhe palavras (`references/descoberta-e-seo.md`).
 
 | Ruim | Bom |
 |---|---|

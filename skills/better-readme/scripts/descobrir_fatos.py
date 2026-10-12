@@ -208,6 +208,7 @@ def analisar_manifestos(raiz: Path, arquivos: list[Path]) -> tuple[dict, Counter
             "description": proj.get("description") or poetry.get("description") or campo_toml(texto, "description"),
             "requires-python": proj.get("requires-python") or campo_toml(texto, "requires-python"),
             "scripts": list((proj.get("scripts") or poetry.get("scripts") or {}).keys()),
+            "keywords": proj.get("keywords") or poetry.get("keywords") or [],
         }
         if man["pyproject.toml"]["scripts"] or re.search(r"\[(project|tool\.poetry)\.scripts\]", texto):
             marca("cli", 3, "pyproject define scripts de linha de comando")
@@ -235,6 +236,8 @@ def analisar_manifestos(raiz: Path, arquivos: list[Path]) -> tuple[dict, Counter
             "version": pac.get("version") or campo_toml(texto, "version"),
             "description": pac.get("description") or campo_toml(texto, "description"),
             "license": pac.get("license") or campo_toml(texto, "license"),
+            "keywords": pac.get("keywords") or [],
+            "categories": pac.get("categories") or [],
         }
         if (raiz / "src" / "main.rs").exists() or "[[bin]]" in texto:
             marca("cli", 2, "Cargo com binário (src/main.rs ou [[bin]])")
@@ -270,7 +273,10 @@ def analisar_manifestos(raiz: Path, arquivos: list[Path]) -> tuple[dict, Counter
                 "wpf_winforms": bool(re.search(r"<Use(WPF|WindowsForms)>\s*true", t, re.I)),
             })
             if re.search(r"<OutputType>\s*WinExe", t, re.I) or re.search(r"<Use(WPF|WindowsForms)>\s*true", t, re.I):
-                marca("app-desktop", 3, f"{p.name}: WinExe/WPF/WinForms")
+                rotulo = ("UseWPF" if re.search(r"<UseWPF>\s*true", t, re.I)
+                          else "UseWindowsForms" if re.search(r"<UseWindowsForms>\s*true", t, re.I)
+                          else "OutputType WinExe")
+                marca("app-desktop", 3, f"{p.name}: {rotulo}")
             elif re.search(r"<OutputType>\s*Exe", t, re.I):
                 marca("cli", 2, f"{p.name}: OutputType Exe")
             elif "Microsoft.NET.Sdk.Web" in t:
@@ -535,6 +541,60 @@ def linguagens(arquivos: list[Path]) -> dict:
     return dict(c.most_common(6))
 
 
+TOPIC_LINGUAGEM = {
+    "Python": "python", "JavaScript": "javascript", "TypeScript": "typescript", "C#": "csharp",
+    "Go": "golang", "Rust": "rust", "Java": "java", "Kotlin": "kotlin", "C++": "cpp", "C": "c",
+    "Lua": "lua", "GDScript": "gdscript", "Ruby": "ruby", "PHP": "php", "Swift": "swift",
+    "PowerShell": "powershell", "Batch": "batch-script",
+}
+TOPIC_TIPO = {
+    "cli": ["cli", "command-line-tool"], "biblioteca": ["library"], "app-desktop": ["desktop-app"],
+    "jogo-ou-mod": ["game", "modding"], "api-servico": ["api", "rest-api"],
+    "extensao-navegador": ["browser-extension"], "lista-awesome": ["awesome", "awesome-list"],
+    "app-web": ["web-app"], "documentacao": ["documentation"],
+}
+TOPIC_SINAL = [  # (regex nas evidências/manifestos, topic)
+    (r"\belectron\b", "electron"), (r"\btauri\b", "tauri"), (r"\bfastapi\b", "fastapi"),
+    (r"\bflask\b", "flask"), (r"\bdjango\b", "django"), (r"\busewpf\b|\bwpf\b", "wpf"),
+    (r"usewindowsforms|\bwinforms\b", "winforms"), (r"\bgodot\b", "godot"), (r"\bunity\b", "unity"),
+    (r"\broblox\b|\brojo\b|\bwally\b", "roblox"), (r"\bbepinex\b", "bepinex"),
+    (r"\bfabric\b", "fabric-mod"), (r"net\d+\.\d+-windows|\bwindows\b", "windows"),
+    (r"\bpyside\d*\b|\bpyqt\d*\b", "qt"), (r"\breact\b", "react"), (r"\bvue\b", "vue"),
+    (r"\bsvelte\b", "svelte"),
+]
+
+
+def sugerir_topics(manifestos: dict, langs: dict, tipo: str, evidencias: dict) -> dict:
+    """Candidatos de topics (a confirmar em github.com/topics/<x>) e pistas de palavras de busca."""
+    candidatos: list[str] = []
+    pistas: list[str] = []
+
+    def add(t: str) -> None:
+        t = re.sub(r"[^a-z0-9-]+", "-", t.lower()).strip("-")[:50]
+        if t and t not in candidatos:
+            candidatos.append(t)
+
+    for lang in list(langs)[:3]:
+        if lang in TOPIC_LINGUAGEM:
+            add(TOPIC_LINGUAGEM[lang])
+    for t in TOPIC_TIPO.get(tipo, []):
+        add(t)
+    texto = json.dumps(manifestos, ensure_ascii=False).lower() + " " + " ".join(
+        e for lista in evidencias.values() for e in lista).lower()
+    for padrao, topic in TOPIC_SINAL:
+        if re.search(padrao, texto):
+            add(topic)
+    for chave in ("package.json", "pyproject.toml", "Cargo.toml"):
+        m = manifestos.get(chave) or {}
+        for k in (m.get("keywords") or []) + (m.get("categories") or []):
+            if isinstance(k, str):
+                add(k)
+                pistas.append(k)
+        if m.get("description"):
+            pistas.append(m["description"])
+    return {"topics_candidatos": candidatos[:12], "pistas_para_palavras_de_busca": pistas[:8]}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("pasta", nargs="?", default=".")
@@ -545,8 +605,9 @@ def main() -> int:
     if not raiz.is_dir():
         print(f"Pasta não encontrada: {raiz}", file=sys.stderr)
         return 2
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
+    for fluxo in (sys.stdout, sys.stderr):
+        if hasattr(fluxo, "reconfigure"):
+            fluxo.reconfigure(encoding="utf-8")
 
     arquivos, truncado = listar_arquivos(raiz, args.max_arquivos)
     manifestos, pontos, evid, comandos = analisar_manifestos(raiz, arquivos)
@@ -606,6 +667,7 @@ def main() -> int:
         "midia": info_midia(raiz, arquivos),
         "workflows": info_workflows(raiz),
         "comunidade": comunidade,
+        "descoberta": sugerir_topics(manifestos, linguagens(arquivos), topo, evid),
         "sinais_de_portatil": sinais_portatil(raiz, arquivos),
         "avisos": avisos,
     }

@@ -618,8 +618,9 @@ def main() -> int:
     ap.add_argument("--tipo", choices=["app", "jogo", "mod", "cli", "biblioteca", "api", "awesome", "extensao"])
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args()
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
+    for fluxo in (sys.stdout, sys.stderr):
+        if hasattr(fluxo, "reconfigure"):
+            fluxo.reconfigure(encoding="utf-8")
 
     readme = Path(args.readme).resolve()
     if not readme.is_file():

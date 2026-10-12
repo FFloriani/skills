@@ -46,6 +46,22 @@ python scripts/auditar_readme.py README.md --tipo cli --json
 | P2 | `fato-repetido`, `bloco-repetido` | Um lar por fato: nada dito ou colado duas vezes |
 | P2 | `licenca-restritiva-no-fim`, `paridade-traducao-conteudo` | Licença copyleft/restritiva avisada no topo; blocos/tabelas/imagens iguais entre traduções |
 
+## Auditoria de descoberta (metadados do repositório)
+
+`scripts/auditar_descoberta.py OWNER/REPO --termo "<termo de busca>"` (ou `--pasta`). Lê a API pública; não altera nada. Códigos:
+
+| Prioridade | Código | Verificação |
+|---|---|---|
+| P0 | `sem-licenca` | O GitHub detectou licença |
+| P1 | `sem-descricao`, `descricao-igual-ao-nome` | About escrito e informativo (sem About, o link e o Google usam texto genérico) |
+| P1 | `sem-topics` | Há topics (sem eles, só o nome casa) |
+| P1 | `termo-ausente` | O termo de busca está em nome, About ou topics (campos da busca padrão) |
+| P1 | `fork-fora-da-busca` | Fork fica escondido por padrão |
+| P2 | `poucos-topics`, `nome-generico`, `descricao-curta`, `descricao-longa`, `emoji-na-descricao` | Heurísticas (5 a 10 topics; ≤160 caracteres) |
+| P2 | `sem-website`, `sem-social-preview`, `sem-release`, `perfil-da-comunidade`, `arquivado` | Higiene; não medem ranking |
+
+O relatório diz no rodapé que **mede elegibilidade, não posição**. Não use este resultado para prometer efeito.
+
 ## O que o script NÃO vê (revisão humana, sua)
 
 Faça esta leitura **depois** do script e **antes** de entregar:
