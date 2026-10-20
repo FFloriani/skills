@@ -76,7 +76,30 @@ def git(raiz: Path, *args: str) -> str | None:
 
 
 def listar_arquivos(raiz: Path, limite: int):
+    """Lista os arquivos do projeto.
+
+    Em repositório git usa `git ls-files --cached --others --exclude-standard`, que
+    respeita .gitignore e .git/info/exclude (pastas vendorizadas, projetos aninhados
+    ignorados, dist/ etc. não entram nos fatos). Fora do git, percorre a pasta.
+    """
     arquivos: list[Path] = []
+    try:
+        r = subprocess.run(
+            ["git", "-C", str(raiz), "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+            capture_output=True, timeout=60,
+        )
+        if r.returncode == 0 and r.stdout:
+            for nome in r.stdout.decode("utf-8", errors="replace").split("\0"):
+                if not nome or set(Path(nome).parts[:-1]) & IGNORAR_DIRS:
+                    continue
+                p = raiz / nome
+                if p.is_file():
+                    arquivos.append(p)
+                    if len(arquivos) >= limite:
+                        return arquivos, True
+            return arquivos, False
+    except (OSError, subprocess.SubprocessError):
+        pass
     for atual, dirs, nomes in os.walk(raiz):
         dirs[:] = [d for d in dirs if d not in IGNORAR_DIRS]
         for n in nomes:
