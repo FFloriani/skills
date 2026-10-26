@@ -34,7 +34,7 @@ For players. Scans the installed files of a game and builds a knowledge base (SQ
 
 ### skillsmp-search
 
-Searches the [SkillsMP](https://skillsmp.com) marketplace for community skills by keyword, category, occupation or language. Installing is a separate step behind a safety gate: quarantine, a static scanner for prompt injection, hidden characters, auto-run hooks, credential access and malicious scripts, a manual read, and a verdict you approve before anything reaches `~/.claude/skills/`.
+Searches two directories of community skills with one command: [skills.sh](https://skills.sh) (the one behind Vercel's `npx skills`; lists how many times each skill was installed, no key needed) and [SkillsMP](https://skillsmp.com) (filters by category, occupation and language). If one is down or has no key, the other still answers. Installing is a separate step behind a safety gate: quarantine, a static scanner for prompt injection, hidden characters, auto-run hooks, credential access and malicious scripts, a manual read, and a verdict you approve before anything reaches `~/.claude/skills/`.
 
 ### better-readme
 
@@ -68,7 +68,7 @@ Then type `/datamine`, or ask normally and Claude picks it up.
 |---|---|
 | datamine | Python 3 for the optional scripts (standard library only). Engine tools such as AssetRipper, ILSpy, FModel or Il2CppDumper are installed separately; the skill says which one fits each engine. |
 | theorycraft | Python 3 for the scripts. `openpyxl` is optional (`pip install openpyxl`) for `.xlsx` export; without it you get one CSV per table. |
-| skillsmp-search | Python 3 and a SkillsMP API key (create one at skillsmp.com): set `SKILLSMP_API_KEY`, or put the key on a single line in `~/.config/skillsmp/key`. |
+| skillsmp-search | Python 3. skills.sh needs nothing else. For SkillsMP also add an API key (create one at skillsmp.com): set `SKILLSMP_API_KEY`, or put the key on a single line in `~/.config/skillsmp/key`. Without the key you still get skills.sh. |
 | better-readme | Python 3 for the three scripts (standard library only). One of them reads the public GitHub API; `GITHUB_TOKEN` is optional (private repositories, rate limit). |
 
 The instructions in datamine, theorycraft and better-readme are written in Portuguese; skillsmp-search is in English.
