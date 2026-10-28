@@ -34,7 +34,7 @@ For players. Scans the installed files of a game and builds a knowledge base (SQ
 
 ### skillsmp-search
 
-Searches two directories of community skills with one command: [skills.sh](https://skills.sh) (the one behind Vercel's `npx skills`; lists how many times each skill was installed, no key needed) and [SkillsMP](https://skillsmp.com) (filters by category, occupation and language). If one is down or has no key, the other still answers. Installing is a separate step behind a safety gate: quarantine, a static scanner for prompt injection, hidden characters, auto-run hooks, credential access and malicious scripts, a manual read, and a verdict you approve before anything reaches `~/.claude/skills/`.
+Searches two directories of community skills with one command: [skills.sh](https://skills.sh) (the one behind Vercel's `npx skills`; lists how many times each skill was installed, no key needed) and [SkillsMP](https://skillsmp.com) (filters by category, occupation and language). If one is down or has no key, the other still answers. Installing is a separate step behind a safety gate: quarantine, a static scanner for prompt injection, hidden characters, auto-run hooks, credential access and malicious scripts, a manual read, and nothing reaches `~/.claude/skills/` until you asked for it. A clean result installs right away; anything suspicious stops and waits for your yes.
 
 ### better-readme
 
