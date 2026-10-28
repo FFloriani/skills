@@ -156,8 +156,9 @@ SkillsMP for that search.
   which tend to fall back to generic popular results.
 - Map obvious topic hints to filters: a job role → `occupation`; a domain like
   DevOps/data → `category`; "in Portuguese/Chinese/etc." → `language`.
-- "newest", "latest", "recently added" → `sortBy=recent`. "best", "popular",
-  "top" → `sortBy=stars` (the default).
+- "newest", "latest", "recently added" → `sortBy=recent`. "popular", "top" →
+  `sortBy=stars` (the default). "Best" is not a sort order: it is decided later,
+  by comparing what you read (see "Choosing the finalists").
 - skills.sh needs at least 2 characters and matches loosely, so plain topic
   words work there. A known author or organisation → `--owner` (skills.sh).
   The SkillsMP filters above do not narrow the skills.sh list.
@@ -170,7 +171,7 @@ SkillsMP for that search.
 Summarize, don't dump raw JSON (unless the user asks for JSON). For each skill
 show at least its **name**, where it comes from (author or `owner/repo`), a
 one-line description when the source gives one (SkillsMP does, skills.sh does
-not), its popularity number, and a link. Lead with the most relevant handful.
+not), its popularity number, and a link. Put the best fits first.
 If the user is deciding whether to build vs. reuse, say plainly whether a good
 match already exists.
 
@@ -195,6 +196,36 @@ characters from them and warns when it did (a description with hidden
 characters is itself suspicious). A listing is a lead, not a recommendation:
 never call a skill "safe" or "good to install" from the search result alone.
 
+## Choosing the finalists
+
+A listing is not a comparison. Don't read the first few results and call them
+the candidates: the order is the directory's own ranking (relevance on
+skills.sh, repository stars on SkillsMP), not fit to this user.
+
+1. **Search wide.** Run two or three queries from different angles (the task, the
+   tool or format, a synonym) on both sources and pool the results. Drop
+   duplicates: the same skill often shows up in both directories and in forks.
+2. **Shortlist by fit, not by position.** Weigh each name, source and description
+   (SkillsMP has one, skills.sh does not) against what the user asked and what
+   they already have installed. Cut what is off-topic, a copy of a better-known
+   skill, or does the job of something already installed. Keep every plausible
+   candidate up to about six; if more remain, take the six that fit best and say
+   how many you left out.
+3. **Read the finalists** with the check below (quarantine, scan, read). Reading
+   is what separates a skill that sounds right from one that is right: judge
+   what the file really tells the agent to do, not its description.
+4. **Compare them with each other and name the best one for this need.** "Best"
+   means nothing on its own, so say best for what. Weigh, in this order: fit to
+   the user's task; how specific and checkable the instructions are (concrete
+   rules, examples and tests beat general advice); size, because a long skill
+   costs context every time it loads; what the check found; upkeep (owner, last
+   commit); popularity only to break a tie.
+5. **When finalists do the same job, pick one.** Skills that cover the same
+   ground (three ways to avoid a generic look, two parsers) can contradict each
+   other once loaded together. Name the winner, say why in one line, and put the
+   others under Skip as "same job as X", or Optional if one adds something the
+   winner lacks. Recommend several only when they cover different parts.
+
 ## Answering the user
 
 The user often does not know what a skill is, and a reply that lists skills with
@@ -213,7 +244,9 @@ plain words:
    installs") and is never the reason. Keep a long list readable by grouping: the
    **Install** ones get a line each, **Optional** and **Skip** collapse into one
    line each (names plus a few words of reason). If more than three are marked
-   Install, say which to start with and why.
+   Install, say which to start with and why. Skills that do the same job count
+   as one: name the winner (see "Choosing the finalists") and list the rest as
+   "same job as X".
 3. **One question with a default, for the whole group.** "Want me to install X
    and Y, starting with X? I check each is safe first, about a minute each." Not
    a menu ("skip them, or open one for you to see?").
