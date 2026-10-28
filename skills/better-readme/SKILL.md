@@ -1,6 +1,19 @@
 ---
 name: better-readme
-description: Cria, melhora, audita e traduz o README de projetos no GitHub — lê o repositório para descobrir os fatos reais (tipo, instalação, funcionalidades, releases, licença), escolhe o esqueleto certo (biblioteca, CLI, app desktop, jogo ou mod, API, lista awesome) e escreve um README claro, com proposta de valor e a dor que o projeto resolve, início rápido, funcionalidades, imagens e diagramas, seção de download com versão portátil, apoio (GitHub Sponsors, Buy Me a Coffee, Ko-fi, Pix), idiomas e acessibilidade; depois valida links, imagens e HTML. Use sempre que o usuário pedir para criar, escrever, melhorar, revisar, traduzir ou "deixar profissional" um README, documentar um projeto para publicar no GitHub, montar a página de download de um app, ou disser que ninguém entende o projeto dele no GitHub, mesmo sem dizer "README"; também para FUNDING.yml, botão de sponsor, README multi-idioma, badges e para o projeto ser mais fácil de achar e divulgar (SEO de GitHub: About, topics, social preview, palavras-chave, descrição em PyPI, npm e winget, plano de lançamento). Não use para documentação de API gerada, wiki, site de docs nem para escrever o código do projeto.
+description: >-
+  Cria, melhora, audita e traduz o README de projetos no GitHub — lê o repositório para descobrir
+  os fatos reais (tipo, instalação, funcionalidades, releases, licença), escolhe o esqueleto certo
+  (biblioteca, CLI, app desktop, jogo ou mod, API, lista awesome) e escreve um README claro, com
+  proposta de valor e a dor que o projeto resolve, início rápido, funcionalidades, imagens e
+  diagramas, seção de download com versão portátil, apoio (GitHub Sponsors, Buy Me a Coffee,
+  Ko-fi, Pix), idiomas e acessibilidade; depois valida links, imagens e HTML. Use sempre que o
+  usuário pedir para criar, escrever, melhorar, revisar, traduzir ou "deixar profissional" um
+  README, documentar um projeto para publicar no GitHub, montar a página de download de um app, ou
+  disser que ninguém entende o projeto dele no GitHub, mesmo sem dizer "README"; também para
+  FUNDING.yml, botão de sponsor, README multi-idioma, badges e para o projeto ser mais fácil de
+  achar e divulgar (SEO de GitHub: About, topics, social preview, palavras-chave, descrição em
+  PyPI, npm e winget, plano de lançamento). Não use para documentação de API gerada, wiki, site de
+  docs nem para escrever o código do projeto.
 ---
 
 # README de GitHub que as pessoas entendem
