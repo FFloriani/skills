@@ -1,6 +1,6 @@
 # skills
 
-Skills for Claude Code and claude.ai: study game files, find and vet community skills, write GitHub READMEs.
+Skills for Claude Code and claude.ai: study game files, find and vet community skills, write GitHub READMEs, check a project for security flaws.
 
 [![Last commit](https://img.shields.io/github/last-commit/FFloriani/skills)](https://github.com/FFloriani/skills/commits/main)
 
@@ -14,6 +14,7 @@ A skill is a folder with a `SKILL.md`. Claude loads it when your request matches
 | Get exact answers about a game you play: items, bosses, builds, maps, crafting routes | [theorycraft](skills/theorycraft/) | `/theorycraft` |
 | Find ready-made skills and install them only after a security check | [skillsmp-search](skills/skillsmp-search/) | `/skillsmp-search` |
 | Write, improve or audit a GitHub README, and get About text, topics and a launch plan | [better-readme](skills/better-readme/) | `/better-readme` |
+| Check a project, site, app or game for security flaws, or check what changed before a commit | [vistoria](skills/vistoria/) | `/vistoria` |
 
 ## What each one does
 
@@ -40,6 +41,22 @@ Searches two directories of community skills with one command: [skills.sh](https
 
 Creates, improves, audits and translates GitHub READMEs. It reads the repository first to find the real facts, picks the skeleton for the project type (library, CLI, desktop app, game or mod, API, awesome list), and checks links, images and HTML afterwards. It also audits discoverability metadata (About, topics, search terms) and drafts a launch plan. It never promises stars or ranking, and never suggests buying them.
 
+### vistoria
+
+One command for a security review of your own code. It runs [Gitleaks](https://github.com/gitleaks/gitleaks) (leaked passwords and keys), [OSV-Scanner](https://github.com/google/osv-scanner) (dependencies with known flaws) and [Semgrep](https://github.com/semgrep/semgrep) (unsafe code), checks each finding in the code, and writes one report ordered by severity. In a game project it also checks the official Roblox and Unity rules on the server code.
+
+| Command | What it does |
+|---|---|
+| `/vistoria` | The three tools, the check, its own reading of the entry points, then Claude Security if you confirm the cost |
+| `/vistoria baixo`, `medio` or `alto` | The same, with that effort in Claude Security |
+| `/vistoria rapida` | The three tools and the check |
+| `/vistoria mudanca` | Only what changed, before a commit |
+
+- It changes nothing in the project: the report stays outside it, and fixing is a separate request.
+- A tool that did not run is reported as not run, never as "nothing found". Finding little does not prove the project is safe.
+- No pentest: nothing is executed or tested live.
+- Tested end to end on small projects with planted flaws, so this shows the command works, not how well it does on real code. The cost question and the medium and high efforts of Claude Security were not tested.
+
 ## Install
 
 **Claude Code**: copy the skill folders you want into `~/.claude/skills/`.
@@ -47,7 +64,7 @@ Creates, improves, audits and translates GitHub READMEs. It reads the repository
 ```bash
 git clone https://github.com/FFloriani/skills.git
 cd skills
-cp -r skills/datamine ~/.claude/skills/      # or theorycraft, skillsmp-search, better-readme
+cp -r skills/datamine ~/.claude/skills/      # or theorycraft, skillsmp-search, better-readme, vistoria
 ```
 
 On Windows PowerShell:
@@ -70,8 +87,9 @@ Then type `/datamine`, or ask normally and Claude picks it up.
 | theorycraft | Python 3 for the scripts. `openpyxl` is optional (`pip install openpyxl`) for `.xlsx` export; without it you get one CSV per table. |
 | skillsmp-search | Python 3. skills.sh needs nothing else. For SkillsMP also add an API key (create one at skillsmp.com): set `SKILLSMP_API_KEY`, or put the key on a single line in `~/.config/skillsmp/key`. Without the key you still get skills.sh. |
 | better-readme | Python 3 for the three scripts (standard library only). One of them reads the public GitHub API; `GITHUB_TOKEN` is optional (private repositories, rate limit). |
+| vistoria | Claude Code, Python 3 (standard library only), and `gitleaks`, `osv-scanner` and `semgrep` on your `PATH`. OSV-Scanner sends package names and versions to osv.dev, and Semgrep downloads its rules from semgrep.dev. The [Claude Security](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-security) plugin is optional. Optional settings go in `~/.config/vistoria/config.json`: `base` (folder for tools and reports, default `~/.vistoria`) and `dono_github` (your GitHub account, so it knows which repositories are yours). |
 
-The instructions in datamine, theorycraft and better-readme are written in Portuguese; skillsmp-search is in English.
+The instructions in datamine, theorycraft, better-readme and vistoria are written in Portuguese; skillsmp-search is in English.
 
 ## Structure
 
