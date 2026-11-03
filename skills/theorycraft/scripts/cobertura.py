@@ -6,7 +6,7 @@ observacao). Status aceitos: pendente, extraido, irrelevante, falhou.
 Sai com código 1 se algum arquivo relevante ainda estiver pendente.
 
 Uso:
-    python cobertura.py theorycraft/<jogo>/<versão>/inventario.csv [outros.csv ...] [--top 20]
+    python cobertura.py <jogos>/<jogo>/<versão>/inventario.csv [outros.csv ...] [--top 20]
 """
 from __future__ import annotations
 

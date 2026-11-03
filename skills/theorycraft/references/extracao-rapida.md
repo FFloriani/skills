@@ -38,6 +38,9 @@ lugar) roda numa cópia. Ferramenta que se injeta no jogo só em single-player o
 Unreal com `.pak`/`.utoc` cifrado (a maioria dos MMOs): rode `scripts/verificar_cifra.py` e siga
 `references/chaves-aes.md` para conseguir e validar a chave.
 
+Para achar e ler a fórmula no código compilado (IL2CPP, Mono, nativo), o MCP REA faz o mapa
+nome → endereço → pseudocódigo e guarda a prova: `references/rea.md`.
+
 Ferramentas paradas, evite como padrão: Il2CppDumper (última versão 2024, só até Unity 2022.2),
 Il2CppInspector original (suspenso em 2022), UModel (só até UE4, 2021), AssetStudio original.
 

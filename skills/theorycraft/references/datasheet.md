@@ -7,10 +7,12 @@ vista gerada dele para consultar e filtrar. As fórmulas moram na calculadora (`
 
 ## Estrutura
 ```
-theorycraft/<jogo>/<versão>/
+<jogos>/<jogo>/<versão>/
   README.md        versão, data, cobertura, como consultar
   inventario.csv   todos os arquivos e o status de cada um
   dados/           tabelas extraídas, CSV ou JSON, com o nome original
+  codigo/          código extraído ou decompilado
+  evidencias/      provas do REA (export_evidence_bundle), citadas nas fichas
   jogo.sqlite      banco montado por scripts/montar_banco.py
   esquema.md       o que é cada tabela e coluna, e como se ligam
   catalogo/        o que cada item, magia, habilidade, inimigo e NPC faz e onde conseguir
@@ -21,8 +23,8 @@ theorycraft/<jogo>/<versão>/
   mecanicas/       uma ficha por sistema
   builds/          builds e combos, com números e premissas
   planilha.xlsx    opcional (scripts/exportar_planilha.py)
-theorycraft/<jogo>/calc.py      calculadora (copiada de scripts/calc_modelo.py)
-theorycraft/<jogo>/DIARIO.md    fatos confirmados com fonte e status
+<jogos>/<jogo>/calc.py      calculadora (copiada de scripts/calc_modelo.py)
+<jogos>/<jogo>/DIARIO.md    fatos confirmados com fonte e status
 ```
 
 ## Convenções

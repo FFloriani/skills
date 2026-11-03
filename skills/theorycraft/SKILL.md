@@ -13,11 +13,12 @@ volta para o jogo.
 
 ## Limites (e o porquê)
 
-- Leia a instalação só em modo leitura e extraia para `theorycraft/<jogo>/<versão>/`. Antes de
+- Leia a instalação só em modo leitura e extraia para `<jogos>/<jogo>/<versão>/` (passo 0). Antes de
   usar uma ferramenta que grave no arquivo (decifrar, descompactar no lugar), copie o arquivo para
   a pasta de trabalho. Gravar na instalação pode corromper o jogo.
-- Extraia com o jogo fechado. Nada de injetar, ler memória, interceptar rede ou automatizar o jogo:
-  em jogo online isso dá banimento e afeta outros jogadores. Ferramentas que se injetam no jogo
+- Extraia com o jogo fechado. Nada de injetar, ler memória ou automatizar o jogo, nem mandar ou
+  alterar pacotes: em jogo online isso afeta outros jogadores. Observar o tráfego de rede no próprio
+  PC (com quem o jogo fala, o que manda, quanto e quando) está ok. Ferramentas que se injetam no jogo
   (como o UE4SS) só valem em jogo single-player offline.
 - Arquivo cifrado: pode decifrar uma cópia para leitura, achando a rotina e a chave no próprio
   cliente. Jogos online costumam proibir isso nos termos de uso; avise o usuário uma vez. Não
@@ -31,6 +32,18 @@ volta para o jogo.
 
 ## Base (sempre primeiro)
 
+### 0. Pasta de trabalho
+Tudo de um jogo fica em `<jogos>/<jogo>/<versão>/`. `<jogos>` é a pasta fixa onde o usuário guarda
+o que sabe dos jogos que joga.
+- Use a pasta que ele já definiu (nas instruções ou na memória dele) ou a que já tem guias desse
+  jogo. Se não houver nenhuma, pergunte uma vez e anote a resposta onde a próxima conversa vai
+  ler: a memória que ele usa ou o CLAUDE.md dele. Pasta de estudo para criar jogo não é a pasta
+  de jogos.
+- Nunca use a pasta aberta por acaso, a pasta da skill ou qualquer pasta dentro de um repositório
+  git: o que sai do jogo fica só no PC do usuário. `scripts/inventario.py` recusa esses lugares.
+- Se o jogo já foi extraído antes (pela skill `datamine` ou à mão), aproveite: aponte para essa
+  extração no README e no inventário em vez de tirar tudo de novo.
+
 ### 1. Versão e triagem
 Anote a versão exata do jogo (arquivo de versão, propriedades do executável, manifesto da loja).
 Tudo leva essa versão, porque patch muda número, missão e mapa. Identifique a engine e a ferramenta
@@ -39,7 +52,7 @@ conferir e para preencher o que roda no servidor.
 
 ### 2. Inventário de 100% dos arquivos
 ```
-python scripts/inventario.py "<pasta do jogo>" --saida theorycraft/<jogo>/<versão>
+python scripts/inventario.py "<pasta do jogo>" --saida <jogos>/<jogo>/<versão>
 ```
 Gera `inventario.csv` com todo arquivo (caminho, tamanho, categoria, status). Contêineres (`.pak`,
 bundles, `.pck`) têm arquivos dentro: depois de abrir cada um, acrescente a lista interna ao
@@ -51,17 +64,31 @@ Extraia todo contêiner, tabela, cena/fase e roteiro de missão ou diálogo para
 JSON) e o código para `codigo/`. Marque cada linha do inventário: `extraido`, `irrelevante` (com
 motivo), `falhou` (com o que foi tentado) ou `pendente`. Depois:
 ```
-python scripts/cobertura.py theorycraft/<jogo>/<versão>/inventario.csv
+python scripts/cobertura.py <jogos>/<jogo>/<versão>/inventario.csv
 ```
 "Sem falhas" quer dizer: nenhum arquivo de código, dados, localização ou contêiner fica `pendente`
 e cada `falhou` diz o que foi tentado. As tabelas de localização ligam IDs a nomes e descrições.
 
 ### 4. Banco de dados
 ```
-python scripts/montar_banco.py theorycraft/<jogo>/<versão>/dados --banco theorycraft/<jogo>/<versão>/jogo.sqlite
+python scripts/montar_banco.py <jogos>/<jogo>/<versão>/dados --banco <jogos>/<jogo>/<versão>/jogo.sqlite
 ```
 Uma tabela por arquivo, mais `_fontes`. Crie views que troquem IDs por nomes. Convenções em
 `references/datasheet.md`.
+
+### 5. Código: onde a regra mora e como ler (REA)
+Antes de abrir qualquer ferramenta, ache onde a lógica do jogo mora. Muitos jogos guardam a regra
+em script de texto (Lua, JavaScript, GDScript, Python): aí é só ler. Código compilado se lê com o
+MCP REA, se estiver instalado. Ele só lê arquivos e devolve cada resultado com o que foi lido e o
+que ficou de fora. Quando usar cada ferramenta, a ordem e os cuidados: `references/rea.md`.
+- Unity IL2CPP: `inspect_il2cpp_metadata` dá em segundos o nome e o endereço de cada função; o
+  Ghidra lê só as funções escolhidas (`open_binary` uma vez, depois `batch_decompile`).
+- Unity Mono e .NET: `inspect_managed_members` com o nome exato das classes dá campos, métodos,
+  quem chama quem e os textos usados; o corpo do método vem do ILSpy.
+- Nativo (C++, Unreal, GameMaker YYC): `open_binary`, ache a função pelo texto que ela usa
+  (`search_strings`, `trace_feature`) e leia com `batch_decompile`.
+- Também lê banco SQLite, `.pyc`, APK e captura de rede (`.pcap`) do próprio PC.
+Sem o REA, use as ferramentas de `references/extracao-rapida.md`.
 
 ## O que a base responde
 
@@ -119,18 +146,21 @@ Liste as atividades com horário de reset, limite por dia ou semana, recompensa 
 
 ### Mecânicas
 Para cada sistema da lista de `references/mecanicas-comuns.md`, ache no código onde o número é
-usado e escreva `mecanicas/<sistema>.md`: regra, fórmula, ordem das operações, arredondamento,
-limites, fonte e status. O texto do tooltip descreve, não calcula: vale o código.
+usado (passo 5) e escreva `mecanicas/<sistema>.md`: regra, fórmula, ordem das operações,
+arredondamento, limites, fonte e status. O texto do tooltip descreve, não calcula: vale o código.
+Na fonte, dê o arquivo e a função (com o endereço, em código compilado).
 
 ### Builds
-Copie `scripts/calc_modelo.py` para `theorycraft/<jogo>/calc.py`, implemente as fórmulas
+Copie `scripts/calc_modelo.py` para `<jogos>/<jogo>/calc.py`, implemente as fórmulas
 confirmadas e crie casos de teste com números vistos no jogo (fórmula que não bate volta a
 `inferido`). Defina objetivo, restrições e premissas e busque como em `references/otimizacao.md`:
 ranking com detalhamento, pesos de atributo, breakpoints e o que muda se uma premissa mudar.
 
 ### Patch novo
 Monte o banco da versão nova numa pasta irmã e rode
-`python scripts/diff_versoes.py <antiga>/jogo.sqlite <nova>/jogo.sqlite`. Atualize o que mudou.
+`python scripts/diff_versoes.py <antiga>/jogo.sqlite <nova>/jogo.sqlite`. Isso mostra os números
+que mudaram. Para saber se uma fórmula mudou, compare também o código das funções que as fichas de
+`mecanicas/` citam (`references/rea.md`, seção Patch). Atualize o que mudou.
 
 ## Regras para toda resposta
 
@@ -147,10 +177,12 @@ Monte o banco da versão nova numa pasta irmã e rode
 ## O que entregar
 
 ```
-theorycraft/<jogo>/<versão>/
+<jogos>/<jogo>/<versão>/
   README.md        versão, cobertura, como consultar
   inventario.csv   todos os arquivos e o status de cada um
   dados/           tabelas, cenas e roteiros extraídos (CSV/JSON)
+  codigo/          código extraído ou decompilado
+  evidencias/      provas do REA (export_evidence_bundle), citadas nas fichas
   jogo.sqlite      tudo num banco, com views legíveis
   catalogo/        o que cada item, magia, habilidade, inimigo e NPC faz e onde conseguir
   missoes/         passo a passo de cada missão
@@ -160,8 +192,8 @@ theorycraft/<jogo>/<versão>/
   mecanicas/       uma ficha por sistema
   builds/          builds com ranking, números e premissas
   planilha.xlsx    opcional, gerada do banco (scripts/exportar_planilha.py)
-theorycraft/<jogo>/calc.py      calculadora testada
-theorycraft/<jogo>/DIARIO.md    fatos confirmados, com fonte e status
+<jogos>/<jogo>/calc.py      calculadora testada
+<jogos>/<jogo>/DIARIO.md    fatos confirmados, com fonte e status
 ```
 
 Não precisa gerar tudo de uma vez: monte a base (passos 1 a 4) e produza o que o jogador pedir,

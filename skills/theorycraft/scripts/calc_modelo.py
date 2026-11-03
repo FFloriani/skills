@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Modelo de calculadora e otimizador de builds.
 
-Copie para theorycraft/<jogo>/calc.py e troque cada função marcada EXEMPLO pela fórmula
+Copie para <jogos>/<jogo>/calc.py e troque cada função marcada EXEMPLO pela fórmula
 confirmada do jogo (veja mecanicas/*.md). Toda fórmula precisa de casos em CASOS_DE_TESTE
 com números vistos no jogo (tooltip, dano no boneco de treino, ficha do personagem).
 

@@ -5,7 +5,7 @@ Percorre a pasta do jogo, classifica cada arquivo e grava inventario.csv na past
 de saída (que não pode ficar dentro da pasta do jogo). Nada é alterado no jogo.
 
 Uso:
-    python inventario.py "<pasta do jogo>" --saida theorycraft/<jogo>/<versão>
+    python inventario.py "<pasta do jogo>" --saida <jogos>/<jogo>/<versão>
     python inventario.py "<pasta do jogo>" --saida <pasta> --hash   (sha1 de cada arquivo; lento)
 """
 from __future__ import annotations
@@ -102,6 +102,15 @@ def main(argv: list[str]) -> int:
         return 2
     if saida == raiz or raiz in saida.parents:
         print("A pasta de saída não pode ficar dentro da pasta do jogo.", file=sys.stderr)
+        return 2
+    skill = Path(__file__).resolve().parent.parent
+    if saida == skill or skill in saida.parents:
+        print("A pasta de saída não pode ficar dentro da pasta da skill.", file=sys.stderr)
+        return 2
+    repo = next((p for p in (saida, *saida.parents) if (p / ".git").exists()), None)
+    if repo:
+        # o que sai do jogo fica só no PC: dentro de um repositório, um commit leva para fora
+        print(f"A pasta de saída está dentro do repositório git {repo}. Use a pasta de jogos do usuário.", file=sys.stderr)
         return 2
 
     linhas = []

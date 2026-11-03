@@ -9,7 +9,7 @@ Objetos aninhados viram colunas "pai__filho"; listas viram texto JSON.
 A tabela _fontes registra de qual arquivo veio cada tabela.
 
 Uso:
-    python montar_banco.py theorycraft/<jogo>/<versão>/dados --banco theorycraft/<jogo>/<versão>/jogo.sqlite
+    python montar_banco.py <jogos>/<jogo>/<versão>/dados --banco <jogos>/<jogo>/<versão>/jogo.sqlite
 """
 from __future__ import annotations
 

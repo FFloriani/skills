@@ -57,7 +57,7 @@ que o anti-cheat pune com banimento.
 1. FModel: **Directory** > **AES**, cole a chave (`0x` + 64 hexadecimais), confirme.
 2. O `.pak` deixa o ícone vermelho e a árvore de arquivos aparece. Se a chave for aceita e os
    arquivos continuarem ilegíveis, o estúdio mexeu na engine e o FModel não a suporta (seção 5).
-3. Grave a chave num arquivo local, `estudo/<jogo>/chave.txt` (ou `theorycraft/<jogo>/<versão>/`),
+3. Grave a chave num arquivo local, `<jogos>/<jogo>/<versão>/chave.txt`,
    com a data, a versão do jogo e a origem (link da comunidade ou "scanner"). Esse arquivo fica fora
    de qualquer repositório; coloque-o no `.gitignore`.
 

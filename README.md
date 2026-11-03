@@ -30,8 +30,10 @@ Identifies the engine of a game installed on your PC, copies the files to a stud
 
 For players. Scans the installed files of a game and builds a knowledge base (SQLite database, CSVs and documents): what each item, spell and skill does and where to get it, quests, maps, boss movesets with frame data, best builds, combos, crafting routes, MMO daily routines and patch diffs.
 
-- Read-only: no injection, memory reading or network interception.
+- Read-only: no injection, memory reading or automated traffic to game servers. Watching your own PC's traffic is fine.
 - Online games: rules that run on the server are not in the files, so the skill marks them as measured in play or from a cited community source, never guessed.
+- Compiled code: with the [REA](https://github.com/morluto/rea) (npm `rea-agents`) MCP server installed, it maps function names to addresses (Unity IL2CPP), reads class members (Unity Mono), finds a function by the text it uses (native) and keeps the evidence for every formula.
+- Results go to a fixed games folder you choose, never into a git repository: what comes out of a game stays on your PC.
 
 ### skillsmp-search
 
@@ -84,7 +86,7 @@ Then type `/datamine`, or ask normally and Claude picks it up.
 | Skill | Needs |
 |---|---|
 | datamine | Python 3 for the optional scripts (standard library only). Engine tools such as AssetRipper, ILSpy, FModel or Il2CppDumper are installed separately; the skill says which one fits each engine. |
-| theorycraft | Python 3 for the scripts. `openpyxl` is optional (`pip install openpyxl`) for `.xlsx` export; without it you get one CSV per table. |
+| theorycraft | Python 3 for the scripts. `openpyxl` is optional (`pip install openpyxl`) for `.xlsx` export; without it you get one CSV per table. The REA MCP server is optional, for reading compiled code. |
 | skillsmp-search | Python 3. skills.sh needs nothing else. For SkillsMP also add an API key (create one at skillsmp.com): set `SKILLSMP_API_KEY`, or put the key on a single line in `~/.config/skillsmp/key`. Without the key you still get skills.sh. |
 | better-readme | Python 3 for the three scripts (standard library only). One of them reads the public GitHub API; `GITHUB_TOKEN` is optional (private repositories, rate limit). |
 | vistoria | Claude Code, Python 3 (standard library only), and `gitleaks`, `osv-scanner` and `semgrep` on your `PATH`. OSV-Scanner sends package names and versions to osv.dev, and Semgrep downloads its rules from semgrep.dev. The [Claude Security](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-security) plugin is optional. Optional settings go in `~/.config/vistoria/config.json`: `base` (folder for tools and reports, default `~/.vistoria`) and `dono_github` (your GitHub account, so it knows which repositories are yours). |
