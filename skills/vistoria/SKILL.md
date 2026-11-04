@@ -1,7 +1,8 @@
 ---
 name: vistoria
-description: "Vistoria de segurança de um projeto com um comando só: procura senha e chave vazada (Gitleaks), dependência com falha conhecida (OSV-Scanner) e código inseguro (Semgrep), confere cada achado no código e, se o dono confirmar o custo, acrescenta a leitura profunda do Claude Security. Entrega um relatório único por ordem de gravidade e não altera nada no projeto. Use com /vistoria, /vistoria rapida ou /vistoria mudanca, e sempre que o dono pedir para ver se um projeto, site, app ou jogo dele está seguro, procurar falhas ou brechas contra hacker, ou checar o que mudou antes de um commit, mesmo sem dizer vistoria. Não use para pentest em site no ar, para corrigir falhas já conhecidas nem para estudar jogo de terceiros."
+description: "Vistoria de segurança de um projeto com um comando só: procura senha e chave vazada (Gitleaks), dependência com falha conhecida (OSV-Scanner) e código inseguro (Semgrep), confere cada achado no código e, se o dono confirmar o custo, acrescenta a leitura profunda do Claude Security. Entrega um relatório único por ordem de gravidade e não altera nada no projeto. Roda só quando o dono digita /vistoria, /vistoria rapida ou /vistoria mudanca: é demorada e gasta muitos tokens, então nenhum agente a chama sozinho. Não use para pentest em site no ar, para corrigir falhas já conhecidas nem para estudar jogo de terceiros."
 argument-hint: "[rapida|mudanca|baixo|medio|alto] [pasta]"
+disable-model-invocation: true
 ---
 
 # Vistoria de segurança
