@@ -1,10 +1,10 @@
 # skills
 
-Skills for Claude Code and claude.ai: start a new project, review finished code, check a project for security flaws, study game files, find and vet community skills, write GitHub READMEs.
+Skills for Claude Code and claude.ai: start a new project, plan what to improve in an existing one, review finished code, check a project for security flaws, study game files, find and vet community skills, write GitHub READMEs.
 
 [![Last commit](https://img.shields.io/github/last-commit/FFloriani/skills)](https://github.com/FFloriani/skills/commits/main)
 
-A skill is a folder with a `SKILL.md`. Claude loads it when your request matches its description, or when you type `/<skill-name>`. The exceptions are `revisar` and `vistoria`: they are slow and use many tokens, so they run only when you type the command.
+A skill is a folder with a `SKILL.md`. Claude loads it when your request matches its description, or when you type `/<skill-name>`. The exceptions are `revisar`, `vistoria` and `melhorar`: they are slow and use many tokens, so they run only when you type the command.
 
 ## Which skill do you need?
 
@@ -15,6 +15,7 @@ A skill is a folder with a `SKILL.md`. Claude loads it when your request matches
 | Find ready-made skills and install them only after a security check | [skillsmp-search](skills/skillsmp-search/) | `/skillsmp-search` |
 | Write, improve or audit a GitHub README, and get About text, topics and a launch plan | [better-readme](skills/better-readme/) | `/better-readme` |
 | Start a new app, site, game or tool: study the similar products, decide in one message, get version 0.1 running | [comecar](skills/comecar/) | `/comecar` |
+| Get an improvement plan for a project that already exists, built from a comparison with similar products, with proof for every item | [melhorar](skills/melhorar/) | `/melhorar` |
 | Have a fresh agent check that finished code does what was asked, proving each bug by reproducing it | [revisar](skills/revisar/) | `/revisar` |
 | Check a project, site, app or game for security flaws, or check what changed before a commit | [vistoria](skills/vistoria/) | `/vistoria` |
 
@@ -81,6 +82,26 @@ Then you get one message with 5 to 7 decisions, each with a recommendation drawn
 - No approval steps between stages: it stops only for the decisions message, spending money, publishing or installing outside the project.
 - Used end to end once, on a real desktop tool: research, decisions, version 0.1 and a working app. The research stage alone was also tested on another project: 4 agents, about 7 minutes, 78 findings. There is no formal measurement yet.
 
+### melhorar
+
+For a project that already exists. It delivers an improvement plan built from a comparison with what exists outside the project, and changes no code: you choose what goes in.
+
+1. Reads the project from the inside: the code, the project's memory and documents, and it runs the project when that is safe. It lists each function with its state (works, partial, fragile, untested).
+2. Researches outside, pulled by those functions: who does each one better, and how. It looks at similar products, their repositories and issues, techniques, libraries, what users complain about, and platform limits.
+3. Compares function by function, including where the project is already equal or better.
+4. Writes the plan ordered by gain against effort: the one item to do first, the queue, the big bets, what not to do, the barriers and what only you can decide. Every item carries its proof (a link, a count of complaints, a repository that already does it), how to do it in this project and how to check it worked.
+
+| Command | What it does |
+|---|---|
+| `/melhorar [focus]` | All of the above |
+| `/melhorar rapido [focus]` | Same steps, shorter: the 3 closest similar products and their issues |
+| `/melhorar fundo [focus]` | Everything, with the most complete research tools installed and one researcher per kind of source |
+
+- Runs only when you type `/melhorar`: the research is slow and uses many tokens, so Claude never starts it on its own.
+- Nothing invented: every finding has a link and a date, "not seen in the N sources read" replaces "does not exist", and a technique counts as certain only after a cheap test in a scratch folder.
+- The plan, the comparison and the raw research are saved in the project's documents folder, under `melhoria/<date>/`, so a later run can show what changed.
+- Tested once, in quick mode, on the skillsmp-search skill of this repository: about 10 minutes, 11 outside sources read, and a plan in the format above. Its strongest findings came from running the project against defects that similar tools had already reported. The normal and deep modes were not tested.
+
 ### revisar
 
 A fresh agent that never saw the conversation checks finished code against what was asked. It runs the tests and the program, writes a small reproduction for every suspicion and counts as a bug only what it reproduced. Before hunting rare cases, it opens the program the way a user does and runs the main flow end to end. It fixes each bug at the cause, keeps the reproduction as an automated test, and if it changed anything a second fresh reviewer checks only the fixes and what they touch (up to 3 rounds).
@@ -104,7 +125,7 @@ A fresh agent that never saw the conversation checks finished code against what 
 ```bash
 git clone https://github.com/FFloriani/skills.git
 cd skills
-cp -r skills/datamine ~/.claude/skills/      # or comecar, revisar, vistoria, theorycraft, skillsmp-search, better-readme
+cp -r skills/datamine ~/.claude/skills/      # or comecar, melhorar, revisar, vistoria, theorycraft, skillsmp-search, better-readme
 ```
 
 On Windows PowerShell:
@@ -128,10 +149,11 @@ Then type `/datamine`, or ask normally and Claude picks it up.
 | skillsmp-search | Python 3. skills.sh needs nothing else. For SkillsMP also add an API key (create one at skillsmp.com): set `SKILLSMP_API_KEY`, or put the key on a single line in `~/.config/skillsmp/key`. Without the key you still get skills.sh. |
 | better-readme | Python 3 for the three scripts (standard library only). One of them reads the public GitHub API; `GITHUB_TOKEN` is optional (private repositories, rate limit). |
 | comecar | Claude Code with subagents and web search. A deep research tool is optional; `gh` helps with GitHub issues. Points you to `revisar` and `vistoria` at the end; install those to use the two commands. |
+| melhorar | Claude Code with web search. Subagents are used in the normal and deep modes; `gh` helps with GitHub issues. Optional: a deep research tool (such as a research MCP server), the `deep-research` skill for the deep mode, and `skillsmp-search` when the project is itself a skill, plugin or MCP server. |
 | revisar | Claude Code with subagents, and whatever the project needs to build and run its tests. |
 | vistoria | Claude Code, Python 3 (standard library only), and `gitleaks`, `osv-scanner` and `semgrep` on your `PATH`. OSV-Scanner sends package names and versions to osv.dev, and Semgrep downloads its rules from semgrep.dev. The [Claude Security](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-security) plugin is optional. Optional settings go in `~/.config/vistoria/config.json`: `base` (folder for tools and reports, default `~/.vistoria`) and `dono_github` (your GitHub account, so it knows which repositories are yours). |
 
-The instructions in comecar, revisar, vistoria, datamine, theorycraft and better-readme are written in Portuguese; skillsmp-search is in English.
+The instructions in comecar, melhorar, revisar, vistoria, datamine, theorycraft and better-readme are written in Portuguese; skillsmp-search is in English.
 
 ## Structure
 
